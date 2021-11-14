@@ -33,6 +33,7 @@ class EllipseCurve:
 
     # 乘法运算
     # 递归求解100为1组的加法！加速效果明显（d的指数级增加，d=2时，可得到2的指数级加速！）
+    # 自己始终无法实现高效的乘法，只能改用 pip install tinyec
     def curve_times(self, P: Point, n: int) -> Point:
         # x,y 必须是曲线上的点，否则加法无意义
         d = 2
@@ -42,14 +43,14 @@ class EllipseCurve:
                 # P.print('P')
             return P
         else:
-            P1 = P
-            for i in range(int(n/d)):
-                P1 = self.curve_times(
-                    P1, d)  # 商为下一轮递归的输入
-            P2 = P
-            P2 = self.curve_times(
-                P2, n % d)  # 余数为需要加另外半个结果
-            return self.curve_plus(P1, P2)
+            P1 = self.curve_times(self.curve_times(
+                P, d), int(n/d))  # 商为下一轮递归的输入
+            if n % d >= 0:
+                P2 = self.curve_times(
+                    P, n % d)  # 余数为需要加另外半个结果
+                return self.curve_plus(P1, P2)
+            else:
+                return P1
 
     def curve_times_base(self, P: Point, n: int) -> Point:
         # x,y 必须是曲线上的点，否则加法无意义
@@ -62,7 +63,7 @@ class EllipseCurve:
         P1 = self.curve_times(P, n)
         P2 = self.curve_times_base(P, n)
         P1.print('P1')
-        P2.print('P2-base')
+        P2.print('P2')
 
     def test_g_times(self, n):
         P = self.curve_g_times(n)
