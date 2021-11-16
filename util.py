@@ -3,24 +3,37 @@
 import hashlib
 import random
 import secrets
+import time
 
 
 def big_prime():
     pass
 
 
-def rand_big(n):
+def rand_big(n: int):
     return secrets.randbits(n)
 
 
-def sha256_str(str) -> int:
+def rand_big_str(n: int):
+    return str(rand_big(n))
+
+
+def sha256_str(str: str) -> int:
     f = hashlib.sha256()
     f.update(str.encode('utf-8'))
     return int.from_bytes(f.digest(), byteorder='big')  # byte 转 int
 
 
-def sha256_int(i) -> int:
+def sha256_int(i: int) -> int:
     return sha256_str(str(i))
+
+
+def cost_time(tag: str, f, *args) -> float:
+    start_time = time.time()
+    f(*args)
+    elapse_time = time.time() - start_time
+    print(tag, 'cost time(s):', elapse_time)
+    return elapse_time
 
 
 if __name__ == "__main__":
