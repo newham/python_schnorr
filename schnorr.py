@@ -1,4 +1,17 @@
 # schnorr 签名、群签名
+# Setup:
+
+# x := random number (aka private key) G := common point X := x * G (aka public key)
+
+# Sign:
+
+# r := random number (aka nonce) R := r G (aka commitment) e := Hash(R, X, message)(aka challenge) s := r + e x (aka response) return (R, X, s, message) ((s, e) aka signature)
+
+# Verify:
+
+# receive (R, X, s, message) e := Hash(R, X, message) S1 := R + e X S2 := s G return OK if S1 qeuals S2
+
+
 from util import rand_big, rand_big_str, sha256_str, sha256_int, cost_time
 # from ec import EllipseCurve, get_secp256k1
 import tinyec.ec as ec  # 用第三方库实现椭圆曲线运算
@@ -61,12 +74,11 @@ class Schnorr:
     # 群签名，初始化，生成 聚合公钥
     def setup_mu(self, key_pairs: list) -> Tuple[PubKey, int]:
         # 计算聚合的公钥
-        L_x = 0
-        L_y = 0
-        for key_pair in key_pairs:
-            L_x += key_pair.pk.P.x
-            L_y += key_pair.pk.P.y
-        L = sha256_int(sha256_int(L_x)+sha256_int(L_y))  # int
+        L_P = key_pairs[0].pk.P
+        for i, key_pair in enumerate(key_pairs):
+            if i > 0:
+                L_P += key_pair.pk.P
+        L = sha256_int(L_P.x+L_P.y)  # int
         for i, key_pair in enumerate(key_pairs):
             P_i = key_pair.pk.P
             R_i = key_pair.pk.R
@@ -164,5 +176,12 @@ def test_mu(schnorr: Schnorr, n: int):
 if __name__ == "__main__":
     schnorr = Schnorr(get_secp256k1())
     # cost_time('test_single', test_single, schnorr)
-    # cost_time('test_group', test_group, schnorr, 10)
-    cost_time('test_mu', test_mu, schnorr, 1000)
+    cost_time('test_group', test_group, schnorr, 100)
+    # cost_time('test_mu', test_mu, schnorr, 1000)
+
+## test_mu 1000 ##
+# setup cost time(s): 57.31436896324158
+# sign cost time(s): 0.005015134811401367
+# True
+# validate cost time(s): 0.07626700401306152
+# test_mu cost time(s): 57.39590811729431
