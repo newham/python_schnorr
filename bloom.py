@@ -1,3 +1,4 @@
+import time
 from bloom_filter import BloomFilter
 from util import cost_time, rand_big_hex, rand_big_str
 
@@ -17,18 +18,22 @@ def demo():
 
 
 def test_bloom(n: int):
+    start_time = time.time()
     bloom = BloomFilter(max_elements=n*10, error_rate=0.01)
     test_data = []
     for i in range(n):
         test_data.append(rand_big_str(256))
         bloom.add(test_data[i])
     c = 0
+    print('setup', 'cost time(s):', time.time() - start_time)
+    start_time = time.time()
     for i in range(n):
         if test_data[i] in bloom:
             c += 1
     print(c == n)
+    print('validate', 'cost time(s):', time.time() - start_time)
     pass
 
 
 if __name__ == '__main__':
-    cost_time('test_bloom', test_bloom, 1000)
+    cost_time('test_bloom', test_bloom, 10000)

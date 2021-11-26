@@ -10,6 +10,14 @@ def big_prime():
     pass
 
 
+def rand_diff_int_list(max: int, n: int) -> int:
+    return random.sample(range(0, max), n)
+
+
+def rand_int(max: int) -> int:
+    return random.randint(1, max)
+
+
 def rand_big(n: int) -> int:
     return secrets.randbits(n)
 

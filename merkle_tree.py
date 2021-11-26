@@ -4,6 +4,7 @@
 # from: https://github.com/Tierion/pymerkletools
 
 import hashlib
+import time
 from merkletools import MerkleTools
 
 from util import cost_time, rand_big_str, rand_big_hex, sha256_hex
@@ -25,12 +26,15 @@ def demo():
 
 
 def test_merkle_tree(m: int, n: int):
+    start_time = time.time()
     leafs = []
     for i in range(m):
         leafs.append(rand_big_str(256))
     mt = MerkleTools()  # 默认sha256
     mt.add_leaf(leafs, do_hash=True)
     mt.make_tree()
+    print('setup', 'cost time(s):', time.time() - start_time)
+    start_time = time.time()
     c = 0
     for i in range(m):
         proof_res = mt.validate_proof(mt.get_proof(
@@ -38,9 +42,10 @@ def test_merkle_tree(m: int, n: int):
         if proof_res:
             c += 1
     print(c == m)
+    print('validate', 'cost time(s):', time.time() - start_time)
     pass
 
 
 if __name__ == "__main__":
     # cost_time('demo', demo)
-    cost_time('test merkle tree', test_merkle_tree, 1000, 100)
+    cost_time('test merkle tree', test_merkle_tree, 10000, 10000)
